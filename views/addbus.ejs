@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Bus with Routes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: gray;
+    }
+
+    form {
+      max-width: 600px;
+      margin: auto;
+      background-color: lightblue;
+      padding-top: 3rem;
+      padding-left: 10rem;
+      padding-right: 10rem;
+      padding-bottom: 5px;
+      border-radius: 10px;
+
+    }
+
+    input,
+    select,
+    button {
+      margin-bottom: 10px;
+      display: block;
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    label {
+      margin-top: 10px;
+      display: block;
+    }
+
+    .route {
+      border: 2px solid gray;
+      padding: 10px;
+      margin-bottom: 10px;
+      position: relative;
+      border-radius: 5px;
+    }
+
+    .route .buttons {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .buttons button {
+      flex: 1;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .add-route-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .add-route-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 5px;
+      cursor: pointer;
+      width: 40%;
+    }
+
+    .remove-route {
+      background-color: red;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+  <h1 style="text-align: center;">Add Bus with Routes</h1>
+
+  <!-- enctype="multipart/form-data" for file uploads -->
+  <form action="addbus" method="POST" enctype="multipart/form-data">
+
+    <div class="fieldContainer">
+      <div class="inner">
+        <!-- Bus Details -->
+        <label for="busName">Bus Name:</label>
+        <input type="text" name="busName">
+
+        <label for="busType">Bus Type:</label>
+        <select name="busType">
+          <option value="Mini Bus">Mini Bus</option>
+          <option value="Micro Bus">Micro Bus</option>
+          <option value="Tempo">Tempo</option>
+        </select>
+
+        <label for="noOfBuses">Number of Buses:</label>
+        <input type="number" name="noOfBuses">
+
+        <label for="busPhoto">Bus Photo:</label>
+        <input type="file" name="busPhoto" accept="image/*">
+
+        <label for="startTime">Start Time:</label>
+        <input type="text" name="startTime" placeholder="e.g., 08:00 AM">
+
+        <label for="endTime">End Time:</label>
+        <input type="text" name="endTime" placeholder="e.g., 08:00 PM">
+
+      </div>
+
+      <div class="innersec">
+        <h3>Routes</h3>
+        <!-- Dynamic Routes Section -->
+        <div id="routes-container">
+          <!-- Default Route Field -->
+          <div class="route">
+            <label>Route Name:</label>
+            <input type="text" name="routes[0][routeName]">
+          
+            <label>Longitude:</label>
+            <input type="number" step="any" name="routes[0][longitude]">
+          
+            <label>Latitude:</label>
+            <input type="number" step="any" name="routes[0][latitude]">
+          
+            <div class="buttons">
+              <button type="button" class="remove-route" onclick="removeRoute(this)">Delete</button>
+            </div>
+          </div>
+          
+        </div>
+
+        <!-- Add More Route Section -->
+        <div class="add-route-container">
+          <span>Add More Route</span>
+          <button type="button" class="add-route-btn" onclick="addRoute()">Add</button>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <!-- Submit Button -->
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    // Function to add a new route field dynamically
+    function addRoute() {
+      const container = document.getElementById('routes-container');
+      const index = container.children.length; // Use the current number of routes as the index
+
+      const routeDiv = document.createElement('div');
+      routeDiv.classList.add('route');
+      routeDiv.innerHTML = `
+    <label>Route Name:</label>
+    <input type="text" name="routes[${index}][routeName]">
+
+    <label>Longitude:</label>
+    <input type="number" step="any" name="routes[${index}][longitude]">
+
+    <label>Latitude:</label>
+    <input type="number" step="any" name="routes[${index}][latitude]">
+
+    <div class="buttons">
+      <button type="button" class="remove-route" onclick="removeRoute(this)">Delete</button>
+    </div>
+  `;
+
+      container.appendChild(routeDiv);
+    }
+
+
+    // Function to remove a route field
+    function removeRoute(button) {
+      button.closest('.route').remove();
+    }
+  </script>
+</body>
+
+</html>

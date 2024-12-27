@@ -17,6 +17,8 @@ const userRegister = asynchandler( async (req,res)=>{
     // check user created or not also remove "password and refreshToken from object"
     // return object
 
+    console.log(req.body);
+
     const {fullName, email, password} = req.body;
     if ([fullName,email,password].some((field)=>field?.trim() === "")) {
         throw new ApiError(400,"All Fields are required !!");
@@ -39,9 +41,8 @@ const userRegister = asynchandler( async (req,res)=>{
         password,
         avatar : avatarUpload.url
     });
-    
+
     const createdUser = await User.findById(user._id).select("-refreshToken -password");
-    
     
     if (!createdUser) throw new ApiError(500, "Somthing went wrong while creating user object !!");
 
@@ -56,4 +57,56 @@ const userRegister = asynchandler( async (req,res)=>{
 
 })
 
-export {userRegister}
+const userLogin = asynchandler( async (req,res) => {
+    // get data from req.body
+    // validate date : empty of not
+    // find user
+    // check password is correct or not
+    // generate accessToken and refreshToken
+    // set refreshToken in user collection
+    // remove password and refreshtoken from user object
+    // send tokens in cookie
+    // return user with response
+
+    
+
+    const {email,password} = req.body;
+    
+    if ([email,password].some((field)=>field?.trim()==="")){
+        throw new ApiError(400,"All fields are required !!");
+    }
+
+    const user = await User.findOne({email});
+
+    if (!user) throw new ApiError(404,"User not registered with this crenditials !!");
+
+    const isPasswordValid = await user.isPasswordCorrect(password);
+    if (!isPasswordValid) throw new ApiError(409,"Invalid user crenditials");
+
+    const accessToken = await user.createAccessTocken;
+    const refreshToken = await user.createRefreshTocken;
+
+    if(!accessToken || !refreshToken) throw new ApiError(500, "Somthing went wrong while creating access token and refresh token");
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    const logedInUserer = await user.select("-pasword -refreshToken");
+
+    const option = {
+        httpOnly : true,
+        secure : true
+    }
+
+    return res.status(201).cookie("AccessToken",accessToken,option).cookie("RefreshToken",refreshToken,option).json(new ApiResponse(
+        200,
+        {
+            user : accessToken,refreshToken,logedInUserer
+        },
+        "User Successfully LogedIn !!"
+    ));
+
+
+})
+
+export {userRegister,userLogin}
